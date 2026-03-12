@@ -1,0 +1,25 @@
+<!--ROS 启动文件的根标签，所有节点 / 包含指令都必须包裹在<launch>和</launch>之间，
+标识这是一个 ROS 启动配置文件。-->
+<launch>
+
+  <!--复用已有启动文件，一键加载wpb_stage_slam.launch中定义的所有节点 / 参数-->
+  <include file="$(find wpr_simulation)/launch/wpb_stage_slam.launch"/>
+
+  <!--启动 Hector SLAM 算法节点，实现基于激光雷达的无里程计依赖建图-->
+  <!--<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping"/>                原本-->
+  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping">
+   <param name="map_update_distance_thresh"  value ="0.1"/>
+            <!--地图更新的前进阈值-->    
+   <param name="map_update_angle_thresh"     value ="0.1"/>
+            <!--地图更新的旋转阈值-->    
+   <param name="map_pub_period"              value ="0.1"/>
+            <!--地图的发布周期-->  
+  </node>
+
+  <!--启动 ROS 的 3D 可视化工具 RViz，用于实时查看机器人模型、激光点云、建图结果、TF 变换等-->  <!--args="-d $(find slam_pkg)/rviz/slam.rviz"   后面加的-->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find slam_pkg)/rviz/slam.rviz"  />
+                                       
+  <!--启动 ROS 的图形化控制工具，通过滑块 / 按钮发送速度指令（/cmd_vel话题），手动控制机器人运动。-->
+  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+
+</launch>

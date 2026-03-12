@@ -1,0 +1,12 @@
+<launch>
+
+
+   <include file="$(find wpr_simulation)/launch/wpb_stage_robocup.launch" />
+  
+   <include file="$(find nav_pkg)/launch/nav.launch" />
+
+   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find nav_pkg)/rviz/nav.rviz" >
+      <param name="startup_delay" value="10" />
+   </node>
+   
+</launch>
