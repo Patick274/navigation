@@ -1,0 +1,15 @@
+roslaunch wpr_simulation wpb_simple.launch          //仿真环境
+
+roslaunch wpr_simulation  wpb_rviz.launch           //执行的是 ROS 中启动wpr_simulation功能包下的wpb_rviz.launch文件的命令，通常用于启动 WPB 机器人的仿真环境并加载 RViz 可视化界面
+
+rosrun wpr_simulation  demo_lidar_data              //启动激光雷达数据仿真演示节点，用于生成或发布模拟的激光雷达数据，支撑机器人仿真或算法调试。，
+
+rosrun rqt_robot_steering rqt_robot_steering        //启动速度控制
+
+rosrun hector_mapping hector_mapping                //启动基于激光雷达的 SLAM 建图功能包
+
+rosrun map_server map_saver  -f <命名>              //保存建图并命名
+
+rosrun map_server map_server <名字>.yaml            //打开所保存的地图 （在之前一定得roscore,然后打开rviz）
+
+rosrun rqt_reconfigure rqt_reconfigure              //动态调参

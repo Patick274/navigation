@@ -1,0 +1,85 @@
+建图代码：
+        source catkin_ws/devel/setup.bash  //加载工作空间的环境配置
+        roslaunch wpr_simulation wpb_gmapping.launch  //建图rviz
+        建图完成后
+        rosrun map_server map_saver -f map //将地图保存成文件
+        rospack plugins --attrib=plugin nav_core//检查插件
+    
+    运行 Bridge 的方法：
+    终端 1 (ROS1): 输入 sr1，运行 roscore。
+    终端 2 (ROS2): 输入 sr2，运行你的 ROS2 节点。
+    终端 3 (Bridge): 这个终端需要先后引入两个环境：
+    Bash
+    sr1
+    sr2
+    ros2 run ros1_bridge dynamic_bridge
+    
+    bashrc
+    echo =======================
+echo 请选择环境ROS1 ROS2
+echo r1        加载ROS 1
+echo r2        加载ROS 2
+echo bridge    加载桥接
+echo stop_ros_all 退出所有ros环境
+echo =======================
+                
+# ===================== ROS版本切换配置 =====================
+# 定义ROS 1和ROS 2的环境加载函数
+function r1() {
+    # 先清空现有ROS环境变量，避免冲突
+    unset ROS_DISTRO ROS_VERSION
+    # 加载ROS 1 Noetic（20.04对应的ROS 1版本）
+    source /opt/ros/noetic/setup.bash
+    echo -e "\033[32m✅ 已切换到 ROS 1 Noetic\033[0m"
+    echo "   ROS_DISTRO: $ROS_DISTRO, ROS_VERSION: $ROS_VERSION"
+}
+
+function r2() {
+    # 先清空现有ROS环境变量，避免冲突
+    unset ROS_DISTRO ROS_VERSION
+    # 加载ROS 2 Foxy
+    source /opt/ros/foxy/setup.bash
+    echo -e "\033[34m✅ 已切换到 ROS 2 Foxy\033[0m"
+    echo "   ROS_DISTRO: $ROS_DISTRO, ROS_VERSION: $ROS_VERSION"
+}
+
+
+# 可选：设置默认ROS版本（注释掉则默认不加载任何ROS）
+# set_ros1  # 默认加载ROS 1
+# set_ros2  # 默认加载ROS 2
+# ===================== ROS版本切换配置结束 =====================
+
+# ===================== ROS1/ROS2桥接快捷启动 =====================
+# 启动ROS 1核心 + ros1_bridge（后台运行，避免阻塞终端）
+function bridge() {
+    # 第一步：检查ROS 1核心是否已启动
+    if ! rostopic list &>/dev/null; then
+        echo -e "\033[34m🔄 正在启动ROS 1核心（roscore）...\033[0m"
+        # 后台启动roscore，并重定向日志（避免刷屏）
+        source /opt/ros/noetic/setup.bash
+        roscore > /tmp/roscore.log 2>&1 &
+        sleep 3  # 等待roscore完全启动（关键！避免桥接连不上）
+    else
+        echo -e "\033[32m✅ ROS 1核心已启动\033[0m"
+    fi
+
+    # 第二步：启动ros1_bridge动态桥接节点
+    echo -e "\033[34m🔄 正在启动ros1_bridge桥接节点...\033[0m"
+    source /opt/ros/noetic/setup.bash
+    source /opt/ros/foxy/setup.bash
+    # 前台启动桥接（方便查看日志，按Ctrl+C可停止）
+    ros2 run ros1_bridge dynamic_bridge
+}
+
+# 停止所有ROS相关进程（可选，用于清理）
+function stop_ros_all() {
+    echo -e "\033[31m🔴 正在停止所有ROS进程...\033[0m"
+    # 杀死roscore、bridge、ROS节点等进程
+    pkill -f roscore
+    pkill -f dynamic_bridge
+    pkill -f ros2
+    pkill -f ros1
+    echo -e "\033[32m✅ 所有ROS进程已停止\033[0m"
+}
+# ===================== 桥接快捷启动配置结束 =====================
+

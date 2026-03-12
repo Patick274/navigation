@@ -1,0 +1,206 @@
+mkdir <文件名字>            //创建文件夹
+
+cd    <文件名字>            //打开文件夹
+
+
+ls                         //展开文件
+
+sudo apt install           //用管理员权限从官方软件库安装软件
+
+clear                      //清空当前终端屏幕
+
+git clone 文件网站地址      //将远程仓库的代码完整地复制到本地计算机。
+
+scripts目录用于放置脚本文件和Python程序 （依赖包）
+
+./                         //在当前文件夹里面
+~/                         //回到主目录
+
+catkin_ws                  //Catkin Workspace 的缩写，意思是 ROS 工作空间。
+catkin_make                //运行在catkin_ws文件下进行编译
+
+source                     //载入工作空间的环境设置
+
+setup.bash                //是一个 bash 脚本，用于设置 ROS 工作环境所需的全部环境变量,一般在devel文件中
+
+source ~/catkin_ws/devel/setup.bash  
+
+roslaunch                  //是一个用于自动启动 ROS 节点的工具，它通过 XML 格式的 launch 文件来配置和启动多个节点。
+roslaunch [package_name] [launch_file.launch]
+ [package_name]         指定包含 launch 文件的 ROS 包名
+ [launch_file.launch]   指定要执行的 launch 文件名
+ 
+ 从ROS2切换成ROS1 ：git checkout noetic devel    //一定得打开文件，再执行该操作
+ 
+ 在catkin_ws/src文件里面创建软件包：catkin_create_pkg <包名> <依赖项列表>
+       catkin_create_pkg ssr_pkg rospy roscpp std_msgs
+        rospy=ros+python roscpp=ros+ c++ std_msgs 标准消息包      geometry_msgs 速度消息类型的软件包         senor_msgs 包含了雷达消息格式的软件包
+        地址：   /opt/ros/noetic/share/rospy
+
+  roscd                               //在终端中进入指定软件包的文件地址
+ 
+ gedit ~/.bashrc                     // “.bashrc”Bash Shell 的配置文件，全称是 Bash Run Commands。 
+ gedit 是编辑    cat 是编辑
+ 在末尾：
+ source /opt/ros/noetic/setup.bash          //ros软件包地址        
+ source ~/catkin_ws/devel/setup.bash        //工作空间软件包的地址
+ 
+ 
+ 
+ 
+ 
+     #include <std_msgs/String.h>  标准消息类型的头文件引入语句，核心作用是让你的代码能够使用 ROS 内置的 std_msgs::String 消息类型 —— 用于在 ROS 节点间传递字符串数据（比如文本指令、状态提示、日志信息等）。
+     ros::init(); //用于初始化ROS客户端库，是每个ROS节点必须调用的第一个函数。
+     ros::init(argc,argv,"chao_node");//简单来说，这行代码就是告诉ROS系统："我要启动一个名为'chao_node'的节点，请帮我做好所有准备工作"。
+ 
+     “::”表达的意思 访问
+     std::cout << "Hello";  // 访问std命名空间中的cout
+     ros::init(argc, argv, "node");  // 访问ros命名空间中的init函数
+          ros::ok() 在以下情况下会返回 false：
+     1.收到 SIGINT 信号（Ctrl+C）
+     2.被另一个同名节点踢出 ROS 网络
+     3.调用 ros::shutdown()
+     4.所有 ros::NodeHandle 都被销毁
+    
+     ros::NodeHandle nh:    //在ros中创建了一个节点句柄  相当于管家，   这个管家的命名为 “nh”
+                           //作用：发布 订阅 话题。 调用服务。提供参数
+    标准语法：   ros::NodeHandle <命名> ;
+    
+    ros::Publisher <命名> = （节点、句柄名字）.advertise<    >
+    ros::Publisher publisher = node_handle.advertise<消息类型>("话题名称", 队列大小);
+                                                                  话题名称不能是汉字                     
+                       
+    std_msgs::String 是一种 消息类型，定义在 ROS 的标准消息库中，用于传输字符串数据。
+    语法：   std_msgs::String  <名称>  声明一个名为 <名称> 的变量，它的类型是 std_msgs::String。
+                                  含义： 在 ROS 环境中，创建一个用于承载字符串数据的标准消息对象
+    std(standard标准)      msgs(messages消息)
+    std_msgs 是一个命名空间，是 ROS 中标准消息类型的集合，标准消息对象。   String 是消息的 具体类型名称
+    
+    msg.data = "毕业设计\n" 将一个包含中文 “毕业设计” 和一个换行符的字符串，赋值给" msg "(命名的)对象的 data 属性
+    data 是String类型消息格式 
+    
+    rostopic list 查看活跃着的话题名称
+    rostopic echo <话题名称> 查看活跃着的话题内容
+    rostopic hz   <话题名称>  统计指定话题发送的频率
+               echo -e    启用转义字符解析
+              默认情况下，echo 会把 \ 当作普通字符直接打印（比如 echo "a\nb" 会输出 a\nb）；加上 -e 后，echo 会解析 \ 后的转义字符，实现换行、制表符等特殊效果（比如 echo -e "a\nb" 会输出换行后的 a 和 b）。
+    
+   
+    
+    ros::Rate <对象名字>（频率）   控制循环每秒的次数
+    rostopic echo /<名称>查看活跃着的话题的内容
+    pub(命名的).publish(msg(命名的)) 通过发布者对象 pub，将消息 msg 发布到指定的主题
+    
+    ros::Rate <名称>（频率）控制每秒的发布的频率  //要在while循环中添加:    <名称>.sleep();
+    
+    printf(msg.date)
+    msg.date 是C++标准字符串（std::String），prinft无法直接输出，需要通过在字符串后加入后缀“c.str（）”
+                                                   “c.str()”的作用:将std::String类型（c++风格）转换成C风格的字符串
+                                                   
+    setlocale(LC_ALL, "") 是 C/C++ 中设置系统本地化（Locale）的函数，核心作用是让程序「遵循当前操作系统的区域设置」（包括字符编码、日期格式、数字格式等）—— 对解决你之前的中文乱码问题，它是关键补充（尤其适配 Windows 或非 UTF-8 系统）。
+    
+     viod函数中：ROS_INFO()用于输出日志  如果输出的是中文， 需要在main函数中,在 main 函数开头、ros::init() 之前调用 setlocale(LC_ALL, "")；
+                                                                                                   LC=Locale      LC_ALL设置所有本地化
+    
+    用于在终端或日志文件中打印不同级别的消息   ROS_<> (消息.c.str())
+    ROS_DEBUG：调试细节（默认不输出，需开启调试模式）。
+    ROS_INFO：普通信息。              
+    ROS_WARN：警告。                                                      不受其影响output="screen" 
+    ROS_ERROR：错误（程序功能受影响，但仍能运行）。                         output="screen"
+    ROS_FATAL：致命错误（程序即将崩溃，强制退出）。                         output="screen"
+                                      
+    rqt_graph //是 ROS（Robot Operating System）中用于可视化系统计算图的工具，属于 rqt 工具集的一部分。它能直观展示节点（Nodes）、话题（Topics）、服务（Services）之间的连接关系，帮助开发者调试和理解 ROS 系统架构。                          
+    ros::spinOnce()  是ros C++ 客户端库中的核心函数，用于处理一次 ROS 回调队列中的所有待处理事件（如话题订阅回调、服务请求回调、定时器回调等），是实现 ROS 节点事件驱动机制的关键。
+    
+    XML语法;                                                        launch-prefix="gnome-terminal -e"  使用一个新的终端程序去运行这个节点
+    <name>
+    <标记名称 属性="" ..... />
+    </name>                                                          roslaunch  <>_pkg  <>.launch        //一次性运行多个节点
+    
+    <launch>
+    
+    <include file="$(find 包名)"/>
+    $(find 包名)：ROS 的路径替换语法，自动查找wpr_simulation功能包的安装路径（无需手动写绝对路径）
+    
+    例子：<include file="$(find wpr_simulation)/launch/wpb_stage_slam.launch"/>
+    wpr_simulation 是 WPB（轮式移动机器人）的仿真功能包，wpb_stage_slam.launch 是其预设的启动文件 而/launch/wpb_stage_slam.launch是功能包内的相对路径
+    例子：<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping"/>
+    pkg：节点所属的 ROS 功能包名  type：要启动的可执行文件 / 节点类型名 name：节点在 ROS 网络中的唯一标识名
+    
+    
+    
+    
+    
+    
+    
+
+    RViz   : 接受传感器数据并进行显示，机器人实际能探测到的环境状况，观测的工具而已
+    Gazebo : 我们所看见虚拟机器人所处的环境状况
+    
+    
+    ros::spin() // 阻塞等待回调 
+           进入事件循环，阻塞当前线程，持续监听 ROS 话题、服务、定时器等事件。
+           当有消息到达时，自动调用对应的回调函数（如subscriber的回调函数）。
+           若没有ros::spin()，节点会在初始化后立即退出，无法处理任何异步事件。
+           
+       
+       
+           
+   创建自定义消息      
+    catkin_create_pkg qq_msgs roscpp rospy std_msgs message_generation message_runtime
+        解释：
+             catkin_create_pkg：ROS 中创建 catkin 功能包的工具命令。
+             qq_msgs：要创建的功能包名称。  //一般用msgs作为结尾
+             roscpp：C++ 接口依赖，用于 C++ 编写 ROS 节点。
+             rospy：Python 接口依赖，用于 Python 编写 ROS 节点。
+             std_msgs：ROS 标准消息类型依赖，提供基础消息结构（如String、Int32等）。
+             message_generation：消息生成相关依赖，用于编译时生成自定义消息、服务或动作的代码。
+             message_runtime：消息运行时依赖，用于运行时使用自定义消息。
+
+    rosmsg show qq_msgs/Carry 是 ROS（Robot Operating System）中用于查看特定消息类型详细定义的命令，具体含义拆解如下：
+             rosmsg：ROS 提供的命令行工具，用于操作和查询 ROS 消息（msg）相关信息，比如查看消息定义、列出包内所有消息等。
+             show：rosmsg 的子命令，作用是显示指定消息的具体结构和字段定义。
+             qq_msgs/Carry：指定要查看的消息类型，格式为[包名]/[消息名]：
+             qq_msgs：消息所在的 ROS 功能包名称；
+             Carry：该功能包下定义的具体消息名称（对应.msg文件）。
+           执行该命令后，ROS 会从已编译的消息库中查找 qq_msgs 包下的 Carry.msg 文件，并输出其内容，包括消息包含的字段类型、字段名等。
+   
+   自定义消息的步骤：
+           1.创建新的软件包 catkin_create_pkg <软件包名称>_msgs rospy roscpp std_msgs mssage_generation message_runtime
+           2.软件包中添加msg目录，新建自定义消息文件，以 “.msg”结尾
+           3.在CMake.list文件中，将新建的.msg文件加入   add.message_files()
+           4.在CMake.list文件中,去掉generate_message()的注释符号，将所依赖的其他消息包名称添加进去
+           5.注释掉catkin_pkg中的 CATKIN_DEPENDS message_generation message_runtime roscpp rospy std_msgs ，并确保message_generation message_runtime在其中
+           6.在package.xml中 <exec_depend>和<build_depend>都添加上message_generation、message_runtime
+           7.编译
+   
+   新消息类型在C++节点中的应用
+           1.在节点代码中，头文件#include <***>   自定义包在catkin_ws/devel/include中，复制其地址就行
+           2.在发布订阅话题的时候，将话题中的消息类型设置为新消息类型
+           3.按照新的消息结构，对消息包进行赋值
+           4.CMakeList文件的find_package()中，添加新的消息包名称为依赖项
+           5.在编译规则中，CMake.List末尾添加 add_dependencies(chao_node <消息包名称>_msgs_generate_messages_cpp) 作为依赖项
+           6.在package.xml中，将新消息包添加到<build_depend>和<exec_depend>中去
+           7.编译
+           
+       rosrun rviz rviz -d /home/thunderobot/catkin_ws/src/slam_pkg/rviz/slam.rviz   //启动已经建好图的rviz
+                        -d /home/thunderobot/catkin_ws/src/slam_pkg/rviz/slam.rviz（地址）
+                        args="-d $(find slam_pkg)/rviz/slam.rviz"
+
+    1.-d：rviz 的核心参数，全称 --display-config，表示「加载指定的 rviz 配置文件」（rviz 配置文件后缀为 .rviz，保存了视角、显示的话题、坐标系等可视化配置）。
+    2.$(find slam_pkg)：ROS Launch 文件的内置宏，作用是自动查找 slam_pkg 功能包的根目录路径（无需手动写绝对路径，适配不同环境）。
+    3./rviz/slam.rviz：配置文件在 slam_pkg 功能包中的相对路径，完整路径逻辑为：slam_pkg 根目录/rviz/slam.rviz。
+
+  catkin_create_pkg nav_pkg roscpp rospy move_base_msgs actionlib
+     roscpp：ROS 的 C++ 开发核心库，编写 C++ 节点必备
+     rospy：ROS 的 Python 开发核心库，编写 Python 节点必备
+     move_base_msgs：move_base 导航功能包的核心消息 / 动作类型库（move_base 是 ROS 最核心的自主导航框架）
+     actionlib：ROS 的动作通信库（move_base 是基于 Action 通信实现的，必须依赖这个库才能调用 move_base 的导航服务）
+     
+     gedit ~/.bashrc
+
+source ~/catkin_ws/devel/setup.bash
+source  /opt/ros/noetic/setup.bash
+
+sudo apt install ros-noetic-teb-local-planner 单独下载TEB规划器
+
